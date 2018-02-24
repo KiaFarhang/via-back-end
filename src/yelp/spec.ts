@@ -50,7 +50,7 @@ describe("Yelp", () => {
             assert.notInclude(searchString, `&longitude=`);
         });
     });
-    describe("searchRestaurants", () => {
+    describe("searchBusinesses", () => {
         const fakeServer = nock("https://api.yelp.com", {
             reqheaders: {
                 authorization: `Bearer ${process.env.YELP_KEY}`,
@@ -75,7 +75,7 @@ describe("Yelp", () => {
             let response: YelpSearchResponse;
             let businesses: YelpBusiness[];
             before(async () => {
-                response = await y.searchRestaurants(requestParams.searchTerm, requestParams.location);
+                response = await y.searchBusinesses(requestParams.searchTerm, requestParams.location);
                 businesses = response.businesses;
             });
 
@@ -108,7 +108,7 @@ describe("Yelp", () => {
         describe("Error pinging the Yelp API", () => {
             let searchStub: sinon.SinonStub;
             before(() => {
-                searchStub = sinon.stub(y, "searchRestaurants");
+                searchStub = sinon.stub(y, "searchBusinesses");
                 searchStub.throws();
             });
             after(() => {
@@ -117,13 +117,222 @@ describe("Yelp", () => {
             it("throws an error", async () => {
                 let err;
                 try {
-                    const response = await y.searchRestaurants(requestParams.searchTerm, requestParams.location);
+                    const response = await y.searchBusinesses(requestParams.searchTerm, requestParams.location);
                 } catch (error) {
                     err = error;
                 }
 
                 assert.typeOf(err, "Error");
             });
+        });
+    });
+    describe("removeExpensiveAndClosedBusinesses", () => {
+        it("returns an array of objects", () => {
+            const results = y.removeExpensiveAndClosedBusinesses(mockData.businesses, 20);
+            assert.isArray(results);
+        });
+        it("any closed businesses are removed from the parameter array", () => {
+            const onlyOneClosed = [
+                {
+                  rating: 4,
+                  price: "$",
+                  phone: "+14152520800",
+                  id: "four-barrel-coffee-san-francisco",
+                  is_closed: false,
+                  categories: [
+                    {
+                      alias: "coffee",
+                      title: "Coffee & Tea",
+                    },
+                  ],
+                  review_count: 1738,
+                  name: "Four Barrel Coffee",
+                  url: "https://www.yelp.com/biz/four-barrel-coffee-san-francisco",
+                  coordinates: {
+                    latitude: 37.7670169511878,
+                    longitude: -122.42184275,
+                  },
+                  image_url: "http://s3-media2.fl.yelpcdn.com/bphoto/MmgtASP3l_t4tPCL1iAsCg/o.jpg",
+                  location: {
+                    city: "San Francisco",
+                    country: "US",
+                    address2: "",
+                    address3: "",
+                    state: "CA",
+                    address1: "375 Valencia St",
+                    zip_code: "94103",
+                  },
+                  distance: 1604.23,
+                  transactions: ["pickup", "delivery"],
+                },
+                {
+                    rating: 4,
+                    price: "$",
+                    phone: "+14152520800",
+                    id: "four-barrel-coffee-san-francisco",
+                    is_closed: true,
+                    categories: [
+                      {
+                        alias: "coffee",
+                        title: "Coffee & Tea",
+                      },
+                    ],
+                    review_count: 1738,
+                    name: "Four Barrel Coffee",
+                    url: "https://www.yelp.com/biz/four-barrel-coffee-san-francisco",
+                    coordinates: {
+                      latitude: 37.7670169511878,
+                      longitude: -122.42184275,
+                    },
+                    image_url: "http://s3-media2.fl.yelpcdn.com/bphoto/MmgtASP3l_t4tPCL1iAsCg/o.jpg",
+                    location: {
+                      city: "San Francisco",
+                      country: "US",
+                      address2: "",
+                      address3: "",
+                      state: "CA",
+                      address1: "375 Valencia St",
+                      zip_code: "94103",
+                    },
+                    distance: 1604.23,
+                    transactions: ["pickup", "delivery"],
+                  },
+                  {
+                    rating: 4,
+                    price: "$",
+                    phone: "+14152520800",
+                    id: "four-barrel-coffee-san-francisco",
+                    is_closed: false,
+                    categories: [
+                      {
+                        alias: "coffee",
+                        title: "Coffee & Tea",
+                      },
+                    ],
+                    review_count: 1738,
+                    name: "Four Barrel Coffee",
+                    url: "https://www.yelp.com/biz/four-barrel-coffee-san-francisco",
+                    coordinates: {
+                      latitude: 37.7670169511878,
+                      longitude: -122.42184275,
+                    },
+                    image_url: "http://s3-media2.fl.yelpcdn.com/bphoto/MmgtASP3l_t4tPCL1iAsCg/o.jpg",
+                    location: {
+                      city: "San Francisco",
+                      country: "US",
+                      address2: "",
+                      address3: "",
+                      state: "CA",
+                      address1: "375 Valencia St",
+                      zip_code: "94103",
+                    },
+                    distance: 1604.23,
+                    transactions: ["pickup", "delivery"],
+                  },
+              ];
+            assert.lengthOf(y.removeExpensiveAndClosedBusinesses(onlyOneClosed, 10), 2);
+        });
+        it("any businesses over the dollar limit are removed from the parameter array", () => {
+            const allOpenOneExpensive = [
+                {
+                  rating: 4,
+                  price: "$",
+                  phone: "+14152520800",
+                  id: "four-barrel-coffee-san-francisco",
+                  is_closed: false,
+                  categories: [
+                    {
+                      alias: "coffee",
+                      title: "Coffee & Tea",
+                    },
+                  ],
+                  review_count: 1738,
+                  name: "Four Barrel Coffee",
+                  url: "https://www.yelp.com/biz/four-barrel-coffee-san-francisco",
+                  coordinates: {
+                    latitude: 37.7670169511878,
+                    longitude: -122.42184275,
+                  },
+                  image_url: "http://s3-media2.fl.yelpcdn.com/bphoto/MmgtASP3l_t4tPCL1iAsCg/o.jpg",
+                  location: {
+                    city: "San Francisco",
+                    country: "US",
+                    address2: "",
+                    address3: "",
+                    state: "CA",
+                    address1: "375 Valencia St",
+                    zip_code: "94103",
+                  },
+                  distance: 1604.23,
+                  transactions: ["pickup", "delivery"],
+                },
+                {
+                    rating: 4,
+                    price: "$",
+                    phone: "+14152520800",
+                    id: "four-barrel-coffee-san-francisco",
+                    is_closed: false,
+                    categories: [
+                      {
+                        alias: "coffee",
+                        title: "Coffee & Tea",
+                      },
+                    ],
+                    review_count: 1738,
+                    name: "Four Barrel Coffee",
+                    url: "https://www.yelp.com/biz/four-barrel-coffee-san-francisco",
+                    coordinates: {
+                      latitude: 37.7670169511878,
+                      longitude: -122.42184275,
+                    },
+                    image_url: "http://s3-media2.fl.yelpcdn.com/bphoto/MmgtASP3l_t4tPCL1iAsCg/o.jpg",
+                    location: {
+                      city: "San Francisco",
+                      country: "US",
+                      address2: "",
+                      address3: "",
+                      state: "CA",
+                      address1: "375 Valencia St",
+                      zip_code: "94103",
+                    },
+                    distance: 1604.23,
+                    transactions: ["pickup", "delivery"],
+                  },
+                  {
+                    rating: 4,
+                    price: "$$$$",
+                    phone: "+14152520800",
+                    id: "four-barrel-coffee-san-francisco",
+                    is_closed: false,
+                    categories: [
+                      {
+                        alias: "coffee",
+                        title: "Coffee & Tea",
+                      },
+                    ],
+                    review_count: 1738,
+                    name: "Four Barrel Coffee",
+                    url: "https://www.yelp.com/biz/four-barrel-coffee-san-francisco",
+                    coordinates: {
+                      latitude: 37.7670169511878,
+                      longitude: -122.42184275,
+                    },
+                    image_url: "http://s3-media2.fl.yelpcdn.com/bphoto/MmgtASP3l_t4tPCL1iAsCg/o.jpg",
+                    location: {
+                      city: "San Francisco",
+                      country: "US",
+                      address2: "",
+                      address3: "",
+                      state: "CA",
+                      address1: "375 Valencia St",
+                      zip_code: "94103",
+                    },
+                    distance: 1604.23,
+                    transactions: ["pickup", "delivery"],
+                  },
+              ];
+
+            assert.lengthOf(y.removeExpensiveAndClosedBusinesses(allOpenOneExpensive, 10), 2);
         });
     });
 });
