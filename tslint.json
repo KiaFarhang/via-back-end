@@ -7,6 +7,7 @@
     "rules": {
         "no-var-requires": false,
         "no-console": false,
+        "object-literal-sort-keys": false,
         "interface-name": false
     },
     "rulesDirectory": []
