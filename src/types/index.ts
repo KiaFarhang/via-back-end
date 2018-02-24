@@ -26,7 +26,7 @@ export interface Business {
 export interface YelpSearchResponse {
     total: number;
     businesses: Array<{
-        rating: string;
+        rating: number;
         price: string;
         phone: string;
         id: string;
@@ -40,7 +40,7 @@ export interface YelpSearchResponse {
         url: string;
         coordinates: Location;
         image_url: string;
-        location: Array<{
+        location: {
             city: string;
             country: string;
             address2: string;
@@ -48,7 +48,7 @@ export interface YelpSearchResponse {
             state: string;
             address1: string;
             zip_code: string;
-        }>;
+        };
         distance: number;
         transactions: string[];
     }>;
