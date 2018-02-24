@@ -31,12 +31,19 @@ export const searchBusinesses = async (searchTerm: string, location: Location,
 };
 
 export const sortByPriceAndDistance = (objects: HasPriceAndDistance[]): HasPriceAndDistance[] => {
-    const sortedByPrice = objects.sort((objectA: HasPriceAndDistance, objectB: HasPriceAndDistance) => {
-        return objectA.price.length - objectB.price.length;
-    });
-    const sortedByDistance = sortedByPrice.sort((objectA, objectB) => objectA.distance - objectB.distance);
 
-    return sortedByDistance;
+    const separateArraysByPrice: HasPriceAndDistance[][] = [];
+
+    separateArraysByPrice.push(objects.filter((object) => object.price === "$"));
+    separateArraysByPrice.push(objects.filter((object) => object.price === "$$"));
+    separateArraysByPrice.push(objects.filter((object) => object.price === "$$$"));
+    separateArraysByPrice.push(objects.filter((object) => object.price === "$$$$"));
+
+    separateArraysByPrice.forEach((array: HasPriceAndDistance[]) => {
+        array.sort((objectA, objectB) => objectA.distance - objectB.distance);
+    });
+
+    return separateArraysByPrice.reduce((a, b) => a.concat(b), []);
 };
 
 export const removeExpensiveAndClosedBusinesses = (businesses: YelpBusiness[], money: number): YelpBusiness[] => {

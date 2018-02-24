@@ -335,4 +335,57 @@ describe("Yelp", () => {
             assert.lengthOf(y.removeExpensiveAndClosedBusinesses(allOpenOneExpensive, 10), 2);
         });
     });
+    describe("sortByPriceAndDistance", () => {
+        it("sorts the lowest-dollar-sign businesses to the front of the array", () => {
+            const data = [
+                {
+                    price: "$$$",
+                    distance: 100,
+                },
+                {
+                    price: "$$",
+                    distance: 4,
+                },
+                {
+                    price: "$",
+                    distance: 5,
+                },
+            ];
+            const sorted = y.sortByPriceAndDistance(data);
+            assert.strictEqual(sorted[0].distance, 5);
+            assert.strictEqual(sorted[1].distance, 4);
+            assert.strictEqual(sorted[2].distance, 100);
+        });
+        it("each group of dollar-sign-sorted businesses is sorted by distance", () => {
+            const data = [
+                {
+                    price: "$$$",
+                    distance: 1,
+                },
+                {
+                    price: "$$",
+                    distance: 4,
+                },
+                {
+                    price: "$",
+                    distance: 5,
+                },
+                {
+                    price: "$",
+                    distance: 3,
+                },
+                {
+                    price: "$$",
+                    distance: 2,
+                },
+            ];
+
+            const sorted = y.sortByPriceAndDistance(data);
+            assert.strictEqual(sorted[0].distance, 3);
+            assert.strictEqual(sorted[1].distance, 5);
+            assert.strictEqual(sorted[2].distance, 2);
+            assert.strictEqual(sorted[3].distance, 4);
+            assert.strictEqual(sorted[4].distance, 1);
+        });
+    });
 });
