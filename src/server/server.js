@@ -1,6 +1,8 @@
 const express = require('express');
 // const request = require('request');
 // const moment = require('moment-timezone');
+import { fetchTrips } from '../yelp/index';
+
 
 function getEventData() {
 
@@ -51,6 +53,16 @@ function getPhotos() {
 const port = process.env.PORT || 3000;
 var app = express();
 
-app.post('/distillr-server', (req, res) => {
-    res.send('dingus');
+// {
+//     location: Location;
+//     address ?: string;
+//     startTime: Date;
+//     endTime: Date;
+//     money: number;
+//     searchTerm: string;
+// };
+app.post('/', (req, res) => {
+    
+    console.log(req);
+    res.send('Here ya go');
 });
