@@ -1,7 +1,19 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+require("dotenv").config();
+
+var app = express();
+app.use(bodyParser.json());
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+const port = 8889;
+
 // const request = require('request');
 // const moment = require('moment-timezone');
-import { fetchTrips } from '../yelp/index';
+const fetchTrips = require('../yelp').fetchTrips;
 
 
 function getEventData() {
@@ -50,19 +62,17 @@ function getPhotos() {
 
 }
 
-const port = process.env.PORT || 3000;
-var app = express();
-
-// {
-//     location: Location;
-//     address ?: string;
-//     startTime: Date;
-//     endTime: Date;
-//     money: number;
-//     searchTerm: string;
-// };
-app.post('/', (req, res) => {
+app.post('/', async (req, res) => {
     
-    console.log(req);
-    res.send('Here ya go');
+    try {
+        const arr = await fetchTrips(Object.assign({}, req.body, { startTime: new Date(), endTime: new Date() }));
+        res.send(JSON.stringify(arr));
+    } catch (e) {
+        console.log(e);
+    }
+    
+});
+
+app.listen(port, () => {
+    console.log(`Server is up on port ${port}`);
 });
