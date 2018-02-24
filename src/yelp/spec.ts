@@ -2,13 +2,25 @@ import { assert } from "chai";
 import * as dotenv from "dotenv";
 import * as nock from "nock";
 import * as sinon from "sinon";
-import {YelpBusiness, YelpSearchResponse} from "../types";
+import {UserData, YelpBusiness, YelpSearchResponse} from "../types";
 import * as y from "./index";
 import mockData from "./yelp-api-mock";
 
 dotenv.config();
 
 describe("Yelp", () => {
+    const fakeServer = nock("https://api.yelp.com", {
+        reqheaders: {
+            authorization: `Bearer ${process.env.YELP_KEY}`,
+            host: "api.yelp.com",
+            accept: "application/json",
+        },
+    })
+    .persist()
+    .get("/v3/businesses/search")
+    .query({term: "hamburgers", latitude: 29.4786, longitude: -98.4872})
+    .reply(200, mockData);
+
     after(() => {
         nock.cleanAll();
     });
@@ -51,17 +63,6 @@ describe("Yelp", () => {
         });
     });
     describe("searchBusinesses", () => {
-        const fakeServer = nock("https://api.yelp.com", {
-            reqheaders: {
-                authorization: `Bearer ${process.env.YELP_KEY}`,
-                host: "api.yelp.com",
-                accept: "application/json",
-            },
-        })
-        .persist()
-        .get("/v3/businesses/search")
-        .query({term: "hamburgers", latitude: 29.4786, longitude: -98.4872})
-        .reply(200, mockData);
 
         const requestParams = {
             location: {
@@ -386,6 +387,46 @@ describe("Yelp", () => {
             assert.strictEqual(sorted[2].distance, 2);
             assert.strictEqual(sorted[3].distance, 4);
             assert.strictEqual(sorted[4].distance, 1);
+        });
+    });
+    describe("fetchTrips", () => {
+        describe("Successfully reach Yelp API", async () => {
+            const parameters: UserData = {
+                location: {
+                    latitude: 29.4786,
+                    longitude: -98.4872,
+                },
+                startTime: new Date(),
+                endTime: new Date(),
+                searchTerm: "hamburgers",
+                money: 20,
+            };
+
+            const results = await y.fetchTrips(parameters);
+            it("returns an array of objects", () => {
+                assert.isArray(results);
+                results.forEach((trip) => {
+                    assert.isObject(trip);
+                });
+            });
+            it("each object has a 'minutes' number property", () => {
+                results.forEach((trip) => {
+                    assert.property(trip, "minutes");
+                    assert.isNumber(trip.minutes);
+                });
+            });
+            it("each object has a 'cost' number property", () => {
+                results.forEach((trip) => {
+                    assert.property(trip, "cost");
+                    assert.isNumber(trip.cost);
+                });
+            });
+            it("each object has a 'business' property, which is an object", () => {
+                results.forEach((trip) => {
+                    assert.property(trip, "cost");
+                    assert.isObject(trip.business);
+                });
+            });
         });
     });
 });

@@ -1,5 +1,5 @@
 import * as rp from "request-promise-native";
-import {Location, YelpBusiness, YelpSearchResponse } from "../types";
+import {Business, Location, Trip, UserData, YelpBusiness, YelpSearchResponse } from "../types";
 
 interface HasPriceAndDistance {
     price: string;
@@ -68,5 +68,36 @@ export const generateMaxDollarSignsFromMoney = (money: number): string => {
         return "$$";
     } else {
         return "$";
+    }
+};
+
+export const fetchTrips = async (data: UserData): Promise<Trip[]> => {
+    try {
+        const yelpResponse = await searchBusinesses(data.searchTerm, data.location, data.address);
+        const {businesses} = yelpResponse;
+        const sortedBusinesses =  sortByPriceAndDistance
+        (removeExpensiveAndClosedBusinesses(businesses, data.money)) as YelpBusiness[];
+        const trips: Trip[] = sortedBusinesses.map((yBusiness: YelpBusiness) => {
+            const business: Business = {
+                name: yBusiness.name,
+                imgURL: yBusiness.image_url,
+                isClosed: yBusiness.is_closed,
+                cost: yBusiness.price,
+                phoneNumber: yBusiness.phone,
+                address: `${yBusiness.location.address1} ${yBusiness.location.city}, ${yBusiness.location.zip_code}`,
+                yelpURL: yBusiness.url,
+                coordinates: yBusiness.coordinates,
+            };
+            return {
+                business,
+                minutes: 20,
+                cost: 20,
+            };
+        });
+
+        return trips;
+
+    } catch (error) {
+        throw new Error(error);
     }
 };
