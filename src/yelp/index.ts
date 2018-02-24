@@ -1,6 +1,11 @@
 import * as rp from "request-promise-native";
 import {Location, YelpBusiness, YelpSearchResponse } from "../types";
 
+interface HasPriceAndDistance {
+    price: string;
+    distance: number;
+}
+
 export const buildSearchQueryString = (searchTerm: string, location?: Location, address?: string): string => {
 
     return `https://api.yelp.com/v3/businesses/search?term=${searchTerm}&${location ?
@@ -23,6 +28,15 @@ export const searchBusinesses = async (searchTerm: string, location: Location,
     } catch (error) {
         throw new Error(error);
     }
+};
+
+export const sortByPriceAndDistance = (objects: HasPriceAndDistance[]): HasPriceAndDistance[] => {
+    const sortedByPrice = objects.sort((objectA: HasPriceAndDistance, objectB: HasPriceAndDistance) => {
+        return objectA.price.length - objectB.price.length;
+    });
+    const sortedByDistance = sortedByPrice.sort((objectA, objectB) => objectA.distance - objectB.distance);
+
+    return sortedByDistance;
 };
 
 export const removeExpensiveAndClosedBusinesses = (businesses: YelpBusiness[], money: number): YelpBusiness[] => {
