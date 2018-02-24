@@ -1,6 +1,20 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+require("dotenv").config();
+
+var app = express();
+app.use(bodyParser.json());
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+const port = 8889;
+
 // const request = require('request');
 // const moment = require('moment-timezone');
+const fetchTrips = require('../yelp').fetchTrips;
+
 
 function getEventData() {
 
@@ -48,9 +62,17 @@ function getPhotos() {
 
 }
 
-const port = process.env.PORT || 3000;
-var app = express();
+app.post('/', async (req, res) => {
+    
+    try {
+        const arr = await fetchTrips(Object.assign({}, req.body, { startTime: new Date(), endTime: new Date() }));
+        res.send(JSON.stringify(arr));
+    } catch (e) {
+        console.log(e);
+    }
+    
+});
 
-app.post('/distillr-server', (req, res) => {
-    res.send('dingus');
+app.listen(port, () => {
+    console.log(`Server is up on port ${port}`);
 });
