@@ -1,5 +1,6 @@
 export interface UserData {
     location: Location;
+    address?: string;
     startTime: Date;
     endTime: Date;
     money: number;
@@ -25,8 +26,14 @@ export interface Business {
 
 export interface YelpSearchResponse {
     total: number;
-    businesses: Array<{
-        rating: number;
+    businesses: YelpBusiness[];
+    region: {
+        center: Location;
+    };
+}
+
+export interface YelpBusiness {
+    rating: number;
         price: string;
         phone: string;
         id: string;
@@ -51,10 +58,6 @@ export interface YelpSearchResponse {
         };
         distance: number;
         transactions: string[];
-    }>;
-    region: {
-        center: Location;
-    };
 }
 
 export interface Location {
