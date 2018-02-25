@@ -1,6 +1,6 @@
 import * as rp from "request-promise-native";
 import {Business, Location, Trip, UserData, YelpBusiness, YelpSearchResponse } from "../types";
-
+import { generateRangeFromDollarSigns, calculateTimeNeeded } from '../util';
 interface HasPriceAndDistance {
     price: string;
     distance: number;
@@ -89,10 +89,11 @@ export const fetchTrips = async (data: UserData): Promise<Trip[]> => {
                 coordinates: yBusiness.coordinates,
                 rating: yBusiness.rating,
             };
+            console.log(yBusiness.categories);
             return {
                 business,
-                minutes: 20,
-                cost: `$20`,
+                minutes: calculateTimeNeeded(yBusiness.categories[0].alias, business.cost),
+                cost: generateRangeFromDollarSigns(business.cost),
             };
         });
 
