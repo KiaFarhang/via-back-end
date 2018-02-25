@@ -10,7 +10,7 @@ export interface UserData {
 export interface Trip {
     business: Business;
     minutes: number;
-    cost: number;
+    cost: string;
 }
 
 export interface Business {
@@ -22,6 +22,7 @@ export interface Business {
     address: string;
     yelpURL: string;
     coordinates: Location;
+    rating: number;
 }
 
 export interface YelpSearchResponse {
