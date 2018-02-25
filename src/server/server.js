@@ -1,15 +1,19 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require("cors");
 require("dotenv").config();
 
 var app = express();
 app.use(bodyParser.json());
+<<<<<<< HEAD
 
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
+=======
+>>>>>>> dc33a92d8d015490e47027e0f6c01f6930d9f409
 const port = 8889;
 
 // const request = require('request');
@@ -63,8 +67,16 @@ function getPhotos() {
 
 }
 
-app.post('/', async (req, res) => {
-    
+// app.use(function (req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Methods", "POST,OPTIONS");
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//     next();
+// });
+
+// app.options('*', cors()) // include before other routes
+app.options('/', cors())
+app.post('/', cors(), async (req, res) => {
     try {
         const arr = await fetchTrips(Object.assign({}, req.body, { startTime: new Date(), endTime: new Date() }));
         res.send(JSON.stringify(arr));
