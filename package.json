@@ -26,10 +26,12 @@
     "typescript": "^2.7.2"
   },
   "dependencies": {
+    "@types/cors": "^2.8.3",
     "@types/dotenv": "^4.0.2",
     "@types/request": "^2.47.0",
     "@types/request-promise-native": "^1.0.13",
     "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
     "dotenv": "^5.0.0",
     "express": "^4.16.2",
     "request": "^2.83.0",
