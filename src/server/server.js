@@ -64,7 +64,8 @@ app.use(function (req, res, next) {
 });
 
 app.post('/', async (req, res) => {
-    
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
         const arr = await fetchTrips(Object.assign({}, req.body, { startTime: new Date(), endTime: new Date() }));
         res.send(JSON.stringify(arr));
