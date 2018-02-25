@@ -65,6 +65,8 @@ function getPhotos() {
 //     next();
 // });
 
+app.options('*', cors()) // include before other routes
+
 app.post('/', cors(), async (req, res) => {
     try {
         const arr = await fetchTrips(Object.assign({}, req.body, { startTime: new Date(), endTime: new Date() }));
