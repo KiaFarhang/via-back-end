@@ -87,11 +87,12 @@ export const fetchTrips = async (data: UserData): Promise<Trip[]> => {
                 address: `${yBusiness.location.address1} ${yBusiness.location.city}, ${yBusiness.location.zip_code}`,
                 yelpURL: yBusiness.url,
                 coordinates: yBusiness.coordinates,
+                rating: yBusiness.rating,
             };
             return {
                 business,
                 minutes: 20,
-                cost: 20,
+                cost: `$20`,
             };
         });
 
