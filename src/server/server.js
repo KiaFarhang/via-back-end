@@ -5,15 +5,6 @@ require("dotenv").config();
 
 var app = express();
 app.use(bodyParser.json());
-<<<<<<< HEAD
-
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
-=======
->>>>>>> dc33a92d8d015490e47027e0f6c01f6930d9f409
 const port = 8889;
 
 // const request = require('request');
