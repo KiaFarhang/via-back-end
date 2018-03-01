@@ -8,6 +8,12 @@ const port = 8889;
 
 const fetchTrips = require('../yelp').fetchTrips;
 
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 app.options("/", function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -15,7 +21,7 @@ app.options("/", function (req, res, next) {
     res.sendStatus(200);
 });
 
-app.post('/', cors(), async (req, res) => {
+app.post('/', async (req, res) => {
     try {
         const arr = await fetchTrips(Object.assign({}, req.body, { startTime: new Date(), endTime: new Date() }));
         res.send(JSON.stringify(arr));
