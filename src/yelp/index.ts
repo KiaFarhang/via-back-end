@@ -1,6 +1,6 @@
 import * as rp from "request-promise-native";
-import {Business, Location, Trip, UserData, YelpBusiness, YelpSearchResponse } from "../types";
-import { generateRangeFromDollarSigns, calculateTimeNeeded } from '../util';
+import { Business, Location, Trip, UserData, YelpBusiness, YelpSearchResponse } from "../types";
+import { calculateTimeNeeded, generateRangeFromDollarSigns } from "../util";
 interface HasPriceAndDistance {
     price: string;
     distance: number;
@@ -9,20 +9,21 @@ interface HasPriceAndDistance {
 export const buildSearchQueryString = (searchTerm: string, location?: Location, address?: string): string => {
 
     return `https://api.yelp.com/v3/businesses/search?term=${searchTerm}&${location ?
-    `latitude=${location.latitude}&longitude=${location.longitude}` :
-    `location=${encodeURIComponent(address as string)}`}`;
+        `latitude=${location.latitude}&longitude=${location.longitude}` :
+        `location=${encodeURIComponent(address as string)}`}`;
 };
 
-export const searchBusinesses = async (searchTerm: string, location: Location,
-                                       address?: string): Promise<YelpSearchResponse> => {
-                                            const parameters = {
+export const searchBusinesses = async (
+    searchTerm: string, location: Location,
+    address?: string): Promise<YelpSearchResponse> => {
+    const parameters = {
         uri: buildSearchQueryString(searchTerm, location, address),
         headers: {
-        Authorization: `Bearer ${process.env.YELP_KEY}`,
+            Authorization: `Bearer ${process.env.YELP_KEY}`,
         },
         json: true,
     };
-                                            try {
+    try {
         const response = await rp(parameters);
         return response;
     } catch (error) {
@@ -74,9 +75,9 @@ export const generateMaxDollarSignsFromMoney = (money: number): string => {
 export const fetchTrips = async (data: UserData): Promise<Trip[]> => {
     try {
         const yelpResponse = await searchBusinesses(data.searchTerm, data.location, data.address);
-        const {businesses} = yelpResponse;
-        const sortedBusinesses =  sortByPriceAndDistance
-        (removeExpensiveAndClosedBusinesses(businesses, data.money)) as YelpBusiness[];
+        const { businesses } = yelpResponse;
+        const sortedBusinesses = sortByPriceAndDistance
+            (removeExpensiveAndClosedBusinesses(businesses, data.money)) as YelpBusiness[];
         const trips: Trip[] = sortedBusinesses.map((yBusiness: YelpBusiness) => {
             const business: Business = {
                 name: yBusiness.name,
